@@ -7,7 +7,11 @@ const router = express.Router();
 router.use(cors());
 
 router.get("/:id", cors(), servicesController.getServiceByMieId);
-// router.get("/:id", cors(), palletsController.getMag);
+router.get(
+  "/joinedinfo/:id",
+  cors(),
+  servicesController.getAllJoinedInfoTransakcjeId
+);
 // router.get("/comp/:id", cors(), palletsController.getMagByCompId);
 // router.post("/geo", palletsController.getMagsByGeoCodes);
 router.post("/add", cors(), servicesController.postService);

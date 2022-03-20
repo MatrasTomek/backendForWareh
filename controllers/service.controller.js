@@ -70,7 +70,6 @@ exports.postService = (req, res, next) => {
           return;
         } else {
           errorsArr.push(err);
-
           return;
         }
       });
@@ -86,6 +85,28 @@ exports.postService = (req, res, next) => {
       addError.dataSetError(errorsArr[0]);
       const errData = helpers.handleErrors();
       res.json(errData);
+    }
+  });
+};
+
+exports.getAllJoinedInfoTransakcjeId = (req, res, next) => {
+  const { id } = req.params;
+
+  const sqlGetAllJoinedInfo = `SELECT mie_id, mie_rez_od, mie_rez_do, mie_ilosc, uslugi_RodzajeUslug_id, uslugi_pakowanie_id, RodzajeUslug_opis, pakowanie_opis, mag_nazwa, mag_kodpocztowy, mag_adres, mag_miejscowosc, mie_mag_id FROM Miejsca, Uslugi, RodzajeUslug, Pakowanie, Mag WHERE mie_tran_id=${id} and uslugi_mie_id=mie_id and RodzajeUslug_id=uslugi_RodzajeUslug_id and pakowanie_id=uslugi_pakowanie_id and mag_id=mie_mag_id `;
+  db.query(sqlGetAllJoinedInfo, function (err, data, fields) {
+    if (!err) {
+      data[0].tran_id = Number(id);
+      res.json({
+        status: 200,
+        data: data[0],
+      });
+    } else {
+      const error = `errCode:${err.code}, errNo:${err.errno}, ${err.sql}`;
+      addError.dataSetError(error);
+      const errData = helpers.handleErrors();
+      res.json(errData);
+      console.log(error);
+      return;
     }
   });
 };

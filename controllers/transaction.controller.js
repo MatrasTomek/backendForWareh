@@ -28,7 +28,7 @@ exports.getAllTransactionsForOneCompany = (req, res, next) => {
 exports.getAllTransactionsForOneUers = (req, res, next) => {
   const { id } = req.params;
 
-  const sqlTransactionsForUser = `SELECT * FROM Transakcje WHERE tran_id_uzyt='${id}'`;
+  const sqlTransactionsForUser = `SELECT * FROM Transakcje WHERE tran_id_uzyt='${id}' AND tran_status=1`;
 
   db.query(sqlTransactionsForUser, function (err, data, fields) {
     if (!err) {
