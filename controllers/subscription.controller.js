@@ -37,8 +37,11 @@ exports.postSubscription = (req, res, next) => {
       "SELECT podabon_id FROM Pod_Abonament ORDER BY podabon_id DESC LIMIT 1";
     db.query(sqlTopId, function (err, data, fields) {
       if (!err) {
-        podabon_id = data[0].podabon_id + 1;
-        // podabon_id = 0;
+        if (!data.length) {
+          podabon_id = 1;
+        } else {
+          podabon_id = data[0].podabon_id + 1;
+        }
         resolve(podabon_id);
       } else {
         const error = `errCode:${err.code}, errNo:${err.errno}, ${err.sql}`;

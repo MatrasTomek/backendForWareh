@@ -6,11 +6,11 @@ const router = express.Router();
 
 router.use(cors());
 
-router.get(
-  "/company/:id",
-  cors(),
-  palletsController.getPalletsPlacesForCompanyById
-);
+// router.get(
+//   "/company/:id",
+//   cors(),
+//   palletsController.getPalletsPlacesForWarehsByCompanyId
+// );
 router.get("/:id", cors(), palletsController.getPalletsPlacesById);
 // router.get("/comp/:id", cors(), palletsController.getMagByCompId);
 // router.post("/geo", palletsController.getMagsByGeoCodes);

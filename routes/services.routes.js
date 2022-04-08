@@ -12,7 +12,12 @@ router.get(
   cors(),
   servicesController.getAllJoinedInfoTransakcjeId
 );
-// router.get("/comp/:id", cors(), palletsController.getMagByCompId);
+router.get(
+  "/warehinfo/:id",
+  cors(),
+  servicesController.getAllJoinedInfoByWarehId
+);
+router.get("/companyinfo/:id", servicesController.getAllJoinedInfoByCompanyId);
 // router.post("/geo", palletsController.getMagsByGeoCodes);
 router.post("/add", cors(), servicesController.postService);
 // router.put("/", cors(), palletsController.putPalletsPlaces);

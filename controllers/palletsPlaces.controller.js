@@ -2,28 +2,49 @@ const db = require("../database");
 const helpers = require("../helpers/handleErrors");
 const addError = require("../helpers/setDataError");
 
-exports.getPalletsPlacesForCompanyById = (req, res, next) => {
-  const { id } = req.params;
-  const sqlSubscriptionTab = `SELECT * FROM Miejsca WHERE mie_uzyt_id = ${id}`;
+// exports.getPalletsPlacesForWarehsByCompanyId = (req, res, next) => {
+//   const { id } = req.params;
 
-  db.query(sqlSubscriptionTab, function (err, data, fields) {
-    if (!err) {
-      res.json({
-        status: 200,
-        data: data,
-      });
-    } else {
-      const error = `errCode:${err.code}, errNo:${err.errno}, ${err.sql}`;
-      addError.dataSetError(error);
-      const errData = helpers.handleErrors();
-      res.json(errData);
-      return;
-    }
-  });
-};
+//   let magIds = null;
+//   const promiseAddPalletsPlaces = new Promise((resolve, reject) => {
+//     const sqlSubscriptionTab = `SELECT mag_id FROM Mag WHERE mag_pod_id=${id} `;
+//     db.query(sqlSubscriptionTab, function (err, data, fields) {
+//       if (!err) {
+//         magIds = data;
+//         resolve(magIds);
+//       } else {
+//         const error = `errCode:${err.code}, errNo:${err.errno}, ${err.sql}`;
+//         addError.dataSetError(error);
+//         const errData = helpers.handleErrors();
+//         res.json(errData);
+//         return;
+//       }
+//     });
+//   });
+//   promiseAddPalletsPlaces.then((magIds) => {
+//     magIds.forEach((item) => {
+//       const sqlGetPlacesForMags = `SELECT * FROM Miejsca WHERE mie_mag_id=${item} `;
+//       db.query(sqlGetPlacesForMags, function (err, data, fields) {
+//         if (!err) {
+//           res.json({
+//             status: 200,
+//             data: data,
+//           });
+//         } else {
+//           const error = `errCode:${err.code}, errNo:${err.errno}, ${err.sql}`;
+//           addError.dataSetError(error);
+//           const errData = helpers.handleErrors();
+//           res.json(errData);
+//           return;
+//         }
+//       });
+//     });
+//   });
+// };
 
 exports.getPalletsPlacesById = (req, res, next) => {
   const { id } = req.params;
+
   const sqlSubscriptionTab = `SELECT * FROM Miejsca WHERE mie_id = ${id}`;
 
   db.query(sqlSubscriptionTab, function (err, data, fields) {
@@ -58,7 +79,7 @@ exports.postPalletsPlaces = (req, res, next) => {
     db.query(sqlTopId, function (err, data, fields) {
       if (!err) {
         if (!data[0]) {
-          mie_id = 0;
+          mie_id = 1;
         } else {
           mie_id = data[0].mie_id + 1;
         }

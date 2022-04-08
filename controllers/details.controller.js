@@ -49,6 +49,7 @@ exports.addDetailsToWareh = (req, res, next) => {
     mdet_militaria,
     mdet_mroznia,
     mdet_wielkosc,
+    mdet_MaxWagaPalety,
   } = req.body;
 
   const promiseTopId = new Promise((resolve, reject) => {
@@ -94,9 +95,10 @@ exports.addDetailsToWareh = (req, res, next) => {
       mdet_militaria,
       mdet_mroznia,
       mdet_wielkosc,
+      mdet_MaxWagaPalety,
     ];
     const sqlAddDetails =
-      "INSERT INTO MagDetails (mdet_id, mdet_mag_id, mdet_ADR, mdet_CHCCP, mdet_Dockirozladunkowe, mdet_ISO,mdet_InstTryskaczowa, mdet_KontrolaTemPIWilgo, mdet_MozliwoscRozladunkuBokiem, mdet_Neutralny, mdet_OdpornoscOgniowa, mdet_Ogrzewanie, mdet_OsuszaniePow, mdet_Spozywcze, mdet_Wysokosc, mdet_chlodnicze, mdet_godzinypracy, mdet_klasa, mdet_latwopalne, mdet_meble, mdet_militaria, mdet_mroznia, mdet_wielkosc) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+      "INSERT INTO MagDetails (mdet_id, mdet_mag_id, mdet_ADR, mdet_CHCCP, mdet_Dockirozladunkowe, mdet_ISO,mdet_InstTryskaczowa, mdet_KontrolaTemPIWilgo, mdet_MozliwoscRozladunkuBokiem, mdet_Neutralny, mdet_OdpornoscOgniowa, mdet_Ogrzewanie, mdet_OsuszaniePow, mdet_Spozywcze, mdet_Wysokosc, mdet_chlodnicze, mdet_godzinypracy, mdet_klasa, mdet_latwopalne, mdet_meble, mdet_militaria, mdet_mroznia, mdet_wielkosc, mdet_MaxWagaPalety) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     db.query(sqlAddDetails, warehDetails, (err, data) => {
       if (!err) {
@@ -124,6 +126,7 @@ exports.addDetailsToWareh = (req, res, next) => {
           mdet_militaria: mdet_militaria,
           mdet_mroznia: mdet_mroznia,
           mdet_wielkosc: mdet_wielkosc,
+          mdet_MaxWagaPalety: mdet_MaxWagaPalety,
         };
         res.json({
           status: 200,
@@ -164,6 +167,7 @@ exports.editWarehDetails = (req, res, next) => {
     mdet_militaria,
     mdet_mroznia,
     mdet_wielkosc,
+    mdet_MaxWagaPalety,
   } = req.body;
 
   const sqlMagDetails = `UPDATE MagDetails SET mdet_ADR='${mdet_ADR}',
@@ -186,7 +190,9 @@ exports.editWarehDetails = (req, res, next) => {
   mdet_meble='${mdet_meble}',
   mdet_militaria='${mdet_militaria}',
   mdet_mroznia='${mdet_mroznia}',
-  mdet_wielkosc='${mdet_wielkosc}' WHERE mdet_id = ${mdet_id}`;
+  mdet_wielkosc='${mdet_wielkosc}',
+  mdet_MaxWagaPalety = '${mdet_MaxWagaPalety}'
+  WHERE mdet_id = ${mdet_id}`;
 
   db.query(sqlMagDetails, (err, data) => {
     if (!err) {

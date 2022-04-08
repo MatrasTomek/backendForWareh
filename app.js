@@ -18,6 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 const criteriaRoutes = require("./routes/zone.routes");
 const companyRoutes = require("./routes/company.routes");
 const detailsRoutes = require("./routes/details.routes");
+const historyRoutes = require("./routes/history.routes");
 const kindOfServicesRoutes = require("./routes/kindOfServices.routes");
 const magsRoutes = require("./routes/mag.routes");
 const packingRoutes = require("./routes/packing.routes");
@@ -29,6 +30,7 @@ const usersRoutes = require("./routes/users.routes");
 
 app.use("/company", companyRoutes);
 app.use("/details", detailsRoutes);
+app.use("/history", historyRoutes);
 app.use("/kindof", kindOfServicesRoutes);
 app.use("/mags", magsRoutes);
 app.use("/packing", packingRoutes);
@@ -39,9 +41,9 @@ app.use("/transactions", transactionRoutes);
 app.use("/user", usersRoutes);
 app.use("/zones", criteriaRoutes);
 
-// const PORT = process.env.PORT || 8080;
-// app.listen(PORT, () => {
-//   console.log(`Server is running on port ${PORT}.`);
-// });
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}.`);
+});
 
 module.exports = app;
