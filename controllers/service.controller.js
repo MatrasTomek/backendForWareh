@@ -25,7 +25,7 @@ exports.getServiceByMieId = (req, res, next) => {
 };
 
 exports.postService = (req, res, next) => {
-  const { pakowanie_id, mie_id, services } = req.body;
+  const { mie_id, services } = req.body;
 
   const promiseSetPrices = new Promise((resolve, reject) => {
     const pricesData = [];
@@ -34,9 +34,8 @@ exports.postService = (req, res, next) => {
       if (!err) {
         services.forEach((item) => {
           const price = data.find(
-            (element) =>
-              element.cendet_RodzajeUslug_id === item &&
-              element.cendet_pakowanie_id === pakowanie_id
+            (element) => element.cendet_RodzajeUslug_id === Number(item)
+            // && element.cendet_pakowanie_id === pakowanie_id
           );
           pricesData.push(price);
         });
