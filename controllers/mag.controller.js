@@ -192,6 +192,7 @@ exports.editMag = (req, res, next) => {
     mag_pod_id,
     mag_nazwa,
     mag_opis,
+    mag_kontakt_email,
     mag_kodpocztowy,
     mag_miejscowosc,
     mag_adres,
@@ -208,7 +209,7 @@ exports.editMag = (req, res, next) => {
   mag_kodpocztowy = '${mag_kodpocztowy}',
   mag_miejscowosc='${mag_miejscowosc}',
   mag_adres='${mag_adres}',
-  mag_Miejsca_deklarowane='${mag_Miejsca_deklarowane}', mag_Miejsca_wolne='${mag_Miejsca_wolne}', mag_wspolrzedne_gps_dl='${mag_wspolrzedne_gps_dl}', mag_wspolrzedne_gps_szer='${mag_wspolrzedne_gps_szer}' WHERE mag_id = ${mag_id}`;
+  mag_Miejsca_deklarowane='${mag_Miejsca_deklarowane}', mag_Miejsca_wolne='${mag_Miejsca_wolne}', mag_wspolrzedne_gps_dl='${mag_wspolrzedne_gps_dl}', mag_wspolrzedne_gps_szer='${mag_wspolrzedne_gps_szer}', mag_kontakt_email='${mag_kontakt_email}' WHERE mag_id = ${mag_id}`;
   db.query(sqlMagData, (err, data) => {
     if (!err) {
       res.json({
@@ -237,6 +238,30 @@ exports.editMagSubscribe = (req, res, next) => {
         data: {
           mag_id: mag_id,
           podabon_id: podabon_id,
+        },
+      });
+    } else {
+      const error = `errCode:${err.code}, errNo:${err.errno}, ${err.sql}`;
+      addError.dataSetError(error);
+      const errData = helpers.handleErrors();
+      res.json(errData);
+      return;
+    }
+  });
+};
+
+exports.setMagFreePalletsFromSubscribe = (req, res, next) => {
+  const { mag_id, palletsToUpdate } = req.body;
+
+  const sqlFreePalletsInMagFromSubscribe = `UPDATE Mag SET mag_Miejsca_wolne = ${palletsToUpdate} WHERE mag_id = ${mag_id}`;
+
+  db.query(sqlFreePalletsInMagFromSubscribe, function (err, data, fields) {
+    if (!err) {
+      res.json({
+        status: 200,
+        data: {
+          mag_id: mag_id,
+          mag_Miejsca_wolne: palletsToUpdate,
         },
       });
     } else {

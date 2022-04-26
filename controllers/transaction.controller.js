@@ -56,7 +56,11 @@ exports.rechargeCompanyAccount = (req, res, next) => {
       "SELECT tran_id FROM Transakcje ORDER BY tran_id DESC LIMIT 1";
     db.query(sqlTopId, function (err, data, fields) {
       if (!err) {
-        tran_id = data[0].tran_id + 1;
+        if (!data.length) {
+          tran_id = 1;
+        } else {
+          tran_id = data[0].tran_id + 1;
+        }
         resolve(tran_id);
       } else {
         reject(console.log(err));
