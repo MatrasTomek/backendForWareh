@@ -110,6 +110,7 @@ exports.addMag = (req, res, next) => {
     mag_wspolrzedne_gps,
     mag_kontakt_email,
   } = req.body;
+
   const promiseTopId = new Promise((resolve, reject) => {
     let mag_id = null;
     const sqlTopId = "SELECT mag_id FROM Mag ORDER BY mag_id DESC LIMIT 1";
