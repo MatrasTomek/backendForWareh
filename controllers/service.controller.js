@@ -25,7 +25,7 @@ exports.getServiceByMieId = (req, res, next) => {
 };
 
 exports.postService = (req, res, next) => {
-  const { mie_id, services, uslugi_wymiar } = req.body;
+  const { mie_id, services, uslugi_ilosc_palet, uslugi_wymiar } = req.body;
 
   const promiseSetPrices = new Promise((resolve, reject) => {
     const pricesData = [];
@@ -60,7 +60,7 @@ exports.postService = (req, res, next) => {
       (pricesData[0].cendet_CenaNetto * uslugi_wymiar[0] * uslugi_wymiar[1]) /
       960000;
 
-    const sqlAddService = `INSERT INTO Uslugi (uslugi_RodzajeUslug_id, uslugi_pakowanie_id, uslugi_mie_id, uslugi_cennik_id, uslugi_wartosc, uslugi_wymiar) VALUES (${pricesData[0].cendet_RodzajeUslug_id}, ${pricesData[0].cendet_pakowanie_id}, ${mie_id}, ${pricesData[0].cendet_id}, ${servicePrice}, POINT(${uslugi_wymiar[0]}, ${uslugi_wymiar[1]}))`;
+    const sqlAddService = `INSERT INTO Uslugi (uslugi_RodzajeUslug_id, uslugi_pakowanie_id, uslugi_mie_id, uslugi_cennik_id, uslugi_wartosc, uslugi_ilosc_palet, uslugi_wymiar) VALUES (${pricesData[0].cendet_RodzajeUslug_id}, ${pricesData[0].cendet_pakowanie_id}, ${mie_id}, ${pricesData[0].cendet_id}, ${servicePrice}, ${uslugi_ilosc_palet}, POINT(${uslugi_wymiar[0]}, ${uslugi_wymiar[1]}))`;
     db.query(sqlAddService, (err, data) => {
       if (!err) {
         return;
@@ -74,7 +74,7 @@ exports.postService = (req, res, next) => {
       (pricesData[1].cendet_CenaNetto * uslugi_wymiar[0] * uslugi_wymiar[1]) /
       960000;
 
-    const sqlAddHandling = `INSERT INTO Uslugi (uslugi_RodzajeUslug_id, uslugi_pakowanie_id, uslugi_mie_id, uslugi_cennik_id, uslugi_wartosc, uslugi_wymiar) VALUES (${pricesData[1].cendet_RodzajeUslug_id}, ${pricesData[1].cendet_pakowanie_id}, ${mie_id}, ${pricesData[1].cendet_id}, ${handlingPrice}, POINT(${uslugi_wymiar[0]}, ${uslugi_wymiar[1]}))`;
+    const sqlAddHandling = `INSERT INTO Uslugi (uslugi_RodzajeUslug_id, uslugi_pakowanie_id, uslugi_mie_id, uslugi_cennik_id, uslugi_wartosc, uslugi_ilosc_palet, uslugi_wymiar) VALUES (${pricesData[1].cendet_RodzajeUslug_id}, ${pricesData[1].cendet_pakowanie_id}, ${mie_id}, ${pricesData[1].cendet_id}, ${handlingPrice}, ${uslugi_ilosc_palet}, POINT(${uslugi_wymiar[0]}, ${uslugi_wymiar[1]}))`;
     db.query(sqlAddHandling, (err, data) => {
       console.log("addhandling", data);
       if (!err) {
@@ -126,7 +126,7 @@ exports.postService = (req, res, next) => {
 exports.getAllJoinedInfoTransakcjeId = (req, res, next) => {
   const { id } = req.params;
 
-  const sqlGetAllJoinedInfo = `SELECT mie_id, mie_rez_od, mie_rez_do, mie_ilosc, uslugi_RodzajeUslug_id, uslugi_wymiar, RodzajeUslug_opis, mag_nazwa, mag_kodpocztowy, mag_adres, mag_miejscowosc, mie_mag_id FROM Miejsca, Uslugi, RodzajeUslug, Mag WHERE mie_tran_id=${id} and uslugi_mie_id=mie_id and RodzajeUslug_id=uslugi_RodzajeUslug_id and mag_id=mie_mag_id `;
+  const sqlGetAllJoinedInfo = `SELECT mie_id, mie_rez_od, mie_rez_do, mie_ilosc, uslugi_RodzajeUslug_id, uslugi_ilosc_palet, uslugi_wymiar, RodzajeUslug_opis, mag_nazwa, mag_kodpocztowy, mag_adres, mag_miejscowosc, mie_mag_id FROM Miejsca, Uslugi, RodzajeUslug, Mag WHERE mie_tran_id=${id} and uslugi_mie_id=mie_id and RodzajeUslug_id=uslugi_RodzajeUslug_id and mag_id=mie_mag_id `;
   db.query(sqlGetAllJoinedInfo, function (err, data, fields) {
     if (!err) {
       data[0].tran_id = Number(id);
