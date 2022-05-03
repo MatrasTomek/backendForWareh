@@ -148,7 +148,7 @@ exports.getAllJoinedInfoTransakcjeId = (req, res, next) => {
 exports.getAllJoinedInfoByWarehId = (req, res, next) => {
   const { id } = req.params;
 
-  const sqlGetAllJoinedInfoWareh = `SELECT mie_id, mie_rez_od, mie_rez_do, mie_ilosc, mie_wyszlo, uslugi_RodzajeUslug_id, uslugi_pakowanie_id, RodzajeUslug_opis, pakowanie_opis FROM Miejsca, Uslugi, RodzajeUslug, Pakowanie WHERE mie_mag_id=${id} and uslugi_mie_id=mie_id and uslugi_RodzajeUslug_id <= 7 and RodzajeUslug_id=uslugi_RodzajeUslug_id and pakowanie_id=uslugi_pakowanie_id `;
+  const sqlGetAllJoinedInfoWareh = `SELECT mie_id, mie_rez_od, mie_rez_do, mie_ilosc, mie_wyszlo, uslugi_RodzajeUslug_id, uslugi_wymiar, uslugi_ilosc_palet, RodzajeUslug_opis FROM Miejsca, Uslugi, RodzajeUslug WHERE mie_mag_id=${id} and uslugi_mie_id=mie_id and uslugi_RodzajeUslug_id <= 7 and RodzajeUslug_id=uslugi_RodzajeUslug_id`;
   db.query(sqlGetAllJoinedInfoWareh, function (err, data, fields) {
     if (!err) {
       res.json({
