@@ -13,12 +13,12 @@ const connection = mysql.createConnection({
   password: password,
   database: dataBase,
 });
-connection.connect(function (err) {
-  if (!err) {
-    console.log("Database is connected successfully !");
-  } else {
-    console.log("TO TEN BŁĄD<<<", err);
-    return;
-  }
-});
+// connection.connect(function (err) {
+//   if (!err) {
+//     console.log("Database is connected successfully !");
+//   } else {
+//     console.log("TO TEN BŁĄD<<<", err);
+//     return;
+//   }
+// });
 module.exports = connection;
