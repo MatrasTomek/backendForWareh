@@ -7,7 +7,7 @@ const user = process.env.SqlUser;
 const password = process.env.SqlPassword;
 const dataBase = process.env.SqlDataBase;
 
-const connection = mysql.createConnection({
+const connection = mysql.createPool({
   host: host,
   user: user,
   password: password,
@@ -22,7 +22,5 @@ const connection = mysql.createConnection({
 //     return;
 //   }
 // });
-
-// connection.end();
 
 module.exports = connection;
