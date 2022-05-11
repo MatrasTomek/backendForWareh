@@ -6,9 +6,9 @@ const app = express();
 
 app.use(cors());
 
-// const config = {
-//   origin: "*",
-// };
+const config = {
+  origin: "*",
+};
 // parse requests of content-type - application/json
 app.use(express.json());
 
