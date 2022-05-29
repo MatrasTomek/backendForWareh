@@ -67,6 +67,15 @@ exports.getMagsByGeoCodes = (req, res) => {
 
   const itemsInRange = [];
 
+  // const sqlDetails = "SELECT * FROM MagDetails";
+  // db.query(sqlMag, function (err, data, fields) {
+  //   if (!err) {
+  //     allWarehDetails = data;
+  //   } else {
+  //     allWarehDetails = [];
+  //   }
+  // });
+
   const sqlMag = "SELECT * FROM Mag WHERE mag_aktywny = 1";
   db.query(sqlMag, function (err, data, fields) {
     if (!err) {
@@ -87,6 +96,11 @@ exports.getMagsByGeoCodes = (req, res) => {
           itemsInRange.push(item);
         }
       });
+
+      // const warehWithDetails = {
+      //   itemsInRange: itemsInRange,
+      //   detailsForRangedWareh: detailsForRangedWareh,
+      // };
       res.json(itemsInRange);
     } else {
       const error = `errCode:${err.code}, errNo:${err.errno}, ${err.sql}`;

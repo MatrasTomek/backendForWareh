@@ -1,8 +1,26 @@
 const db = require("../database");
 const helpers = require("../helpers/handleErrors");
 const addError = require("../helpers/setDataError");
-// GET DETAILS OF MAG BY mdet_mag_id
 
+// GEAT ALL DETAILS
+exports.getAllDetails = (req, res, next) => {
+  const sql = `SELECT * FROM MagDetails`;
+  db.query(sql, function (err, data, fields) {
+    if (!err) {
+      res.json({
+        status: 200,
+        data: data,
+      });
+    } else {
+      const error = `errCode:${err.code}, errNo:${err.errno}, ${err.sql}`;
+      addError.dataSetError(error);
+      const errData = helpers.handleErrors();
+      res.json(errData);
+      return;
+    }
+  });
+};
+// GET DETAILS OF MAG BY mdet_mag_id
 exports.getDetailsById = (req, res, next) => {
   const { id } = req.params;
   const sql = `SELECT * FROM MagDetails WHERE mdet_mag_id = ${id}`;
