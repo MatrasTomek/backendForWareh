@@ -4,9 +4,13 @@ const kindOfServices = require("../controllers/kindOfServives.controllers");
 
 const router = express.Router();
 
-router.use(cors());
+router.use(cors({ origin: "*", methods: "GET, HEAD, PUT, PATCH, POST, DELETE", preflightContinue: false }));
 
-router.get("/", cors(), kindOfServices.getAllKindOfServices);
+router.get(
+	"/",
+	cors({ origin: "*", methods: "GET, HEAD, PUT, PATCH, POST, DELETE", preflightContinue: false }),
+	kindOfServices.getAllKindOfServices,
+);
 // router.get("/:id", cors(), magController.getMag);
 // router.get("/comp/:id", cors(), magController.getMagByCompId);
 // router.post("/geo", magController.getMagsByGeoCodes);

@@ -4,22 +4,54 @@ const magController = require("../controllers/mag.controller");
 
 const router = express.Router();
 
-router.use(cors());
+router.use(cors({ origin: "*", methods: "GET, HEAD, PUT, PATCH, POST, DELETE", preflightContinue: false }));
 
-router.get("/", cors(), magController.getAllMags);
-router.get("/:id", cors(), magController.getMag);
-router.get("/comp/:id", cors(), magController.getMagByCompId);
-router.post("/geo", magController.getMagsByGeoCodes);
-router.post("/add", cors(), magController.addMag);
-router.put("/", cors(), magController.editMag);
-router.put("/subscribe", cors(), magController.editMagSubscribe);
-router.put(
-  "/pallets-sub",
-  cors(),
-  magController.setMagFreePalletsFromSubscribe
+router.get(
+	"/",
+	cors({ origin: "*", methods: "GET, HEAD, PUT, PATCH, POST, DELETE", preflightContinue: false }),
+	magController.getAllMags,
 );
-router.put("/pallets", cors(), magController.editMagFreePallets);
-router.delete("/:id", cors(), magController.deleteMag);
+router.get(
+	"/:id",
+	cors({ origin: "*", methods: "GET, HEAD, PUT, PATCH, POST, DELETE", preflightContinue: false }),
+	magController.getMag,
+);
+router.get(
+	"/comp/:id",
+	cors({ origin: "*", methods: "GET, HEAD, PUT, PATCH, POST, DELETE", preflightContinue: false }),
+	magController.getMagByCompId,
+);
+router.post("/geo", magController.getMagsByGeoCodes);
+router.post(
+	"/add",
+	cors({ origin: "*", methods: "GET, HEAD, PUT, PATCH, POST, DELETE", preflightContinue: false }),
+	magController.addMag,
+);
+router.put(
+	"/",
+	cors({ origin: "*", methods: "GET, HEAD, PUT, PATCH, POST, DELETE", preflightContinue: false }),
+	magController.editMag,
+);
+router.put(
+	"/subscribe",
+	cors({ origin: "*", methods: "GET, HEAD, PUT, PATCH, POST, DELETE", preflightContinue: false }),
+	magController.editMagSubscribe,
+);
+router.put(
+	"/pallets-sub",
+	cors({ origin: "*", methods: "GET, HEAD, PUT, PATCH, POST, DELETE", preflightContinue: false }),
+	magController.setMagFreePalletsFromSubscribe,
+);
+router.put(
+	"/pallets",
+	cors({ origin: "*", methods: "GET, HEAD, PUT, PATCH, POST, DELETE", preflightContinue: false }),
+	magController.editMagFreePallets,
+);
+router.delete(
+	"/:id",
+	cors({ origin: "*", methods: "GET, HEAD, PUT, PATCH, POST, DELETE", preflightContinue: false }),
+	magController.deleteMag,
+);
 
 router.use((request, response) => response.status(404).end());
 

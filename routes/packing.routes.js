@@ -4,9 +4,13 @@ const packingController = require("../controllers/packing.controller");
 
 const router = express.Router();
 
-router.use(cors());
+router.use(cors({ origin: "*", methods: "GET, HEAD, PUT, PATCH, POST, DELETE", preflightContinue: false }));
 
-router.get("/", cors(), packingController.getPackingTable);
+router.get(
+	"/",
+	cors({ origin: "*", methods: "GET, HEAD, PUT, PATCH, POST, DELETE", preflightContinue: false }),
+	packingController.getPackingTable,
+);
 // router.get("/:id", cors(), magController.getMag);
 // router.get("/comp/:id", cors(), magController.getMagByCompId);
 // router.post("/geo", magController.getMagsByGeoCodes);
