@@ -4,7 +4,8 @@ const cors = require("cors");
 
 const app = express();
 
-app.use(cors({ origin: "*", methods: [GET, HEAD, PUT, PATCH, POST, DELETE], preflightContinue: false }));
+app.use(cors({ origin: "*", methods: "GET, HEAD, PUT, PATCH, POST, DELETE", preflightContinue: false }));
+// app.enableCors({ origin: ["http://localhost:3000"], credentials: true });
 
 // parse requests of content-type - application/json
 app.use(express.json());
@@ -38,9 +39,9 @@ app.use("/transactions", transactionRoutes);
 app.use("/user", usersRoutes);
 app.use("/zones", criteriaRoutes);
 
-// const PORT = process.env.PORT || 8080;
-// app.listen(PORT, () => {
-// 	console.log(`Server is running on port ${PORT}.`);
-// });
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+	console.log(`Server is running on port ${PORT}.`);
+});
 
 module.exports = app;
