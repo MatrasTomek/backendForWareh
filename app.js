@@ -4,12 +4,8 @@ const cors = require("cors");
 
 const app = express();
 
-app.use(cors({ origin: "*", methods: "GET,HEAD,PUT,PATCH,POST,DELETE", preflightContinue: false }));
-// app.enableCors({ origin: ["http://localhost:3000"], credentials: true });
+app.use(cors({ origin: "*", methods: [GET, HEAD, PUT, PATCH, POST, DELETE], preflightContinue: false }));
 
-const config = {
-	origin: "*",
-};
 // parse requests of content-type - application/json
 app.use(express.json());
 
