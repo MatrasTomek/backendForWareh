@@ -4,7 +4,7 @@ const magController = require("../controllers/mag.controller");
 
 const router = express.Router();
 
-router.use(cors({ origin: "*" }));
+router.use(cors());
 
 router.get("/", cors(), magController.getAllMags);
 router.get("/:id", cors(), magController.getMag);

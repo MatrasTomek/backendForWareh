@@ -4,7 +4,7 @@ const transactionController = require("../controllers/transaction.controller");
 
 const router = express.Router();
 
-router.use(cors({ origin: "*" }));
+router.use(cors());
 
 router.get("/:podId", cors(), transactionController.getAllTransactionsForOneCompany);
 router.get("/user/:id", cors(), transactionController.getAllTransactionsForOneUers);

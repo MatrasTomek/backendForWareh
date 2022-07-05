@@ -4,7 +4,7 @@ const palletsController = require("../controllers/palletsPlaces.controller");
 
 const router = express.Router();
 
-router.use(cors({ origin: "*" }));
+router.use(cors());
 
 // router.get(
 //   "/company/:id",

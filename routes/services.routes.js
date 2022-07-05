@@ -4,7 +4,7 @@ const servicesController = require("../controllers/service.controller");
 
 const router = express.Router();
 
-router.use(cors({ origin: "*" }));
+router.use(cors());
 
 router.get("/:id", cors(), servicesController.getServiceByMieId);
 router.get("/joinedinfo/:id", cors(), servicesController.getAllJoinedInfoTransakcjeId);

@@ -4,7 +4,7 @@ const packingController = require("../controllers/packing.controller");
 
 const router = express.Router();
 
-router.use(cors({ origin: "*" }));
+router.use(cors());
 
 router.get("/", cors(), packingController.getPackingTable);
 // router.get("/:id", cors(), magController.getMag);

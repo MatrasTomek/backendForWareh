@@ -2,7 +2,7 @@ const express = require("express");
 const subscriptionController = require("../controllers/subscription.controller");
 const cors = require("cors");
 const router = express.Router();
-router.use(cors({ origin: "*" }));
+router.use(cors());
 
 router.get("/:companyId", cors(), subscriptionController.getSubscriptionForOneCompany);
 router.post("/add", cors(), subscriptionController.postSubscription);

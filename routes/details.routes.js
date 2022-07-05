@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const router = express.Router();
-router.use(cors({ origin: "*" }));
+router.use(cors());
 const detailsController = require("../controllers/details.controller");
 
 router.get("/:id", cors(), detailsController.getDetailsById);

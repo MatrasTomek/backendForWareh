@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const router = express.Router();
-router.use(cors({ origin: "*" }));
+router.use(cors());
 const historyController = require("../controllers/history.controller");
 
 router.get("/:abonamId.:magId", cors(), historyController.getHistoryElementById);

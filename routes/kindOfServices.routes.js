@@ -4,7 +4,7 @@ const kindOfServices = require("../controllers/kindOfServives.controllers");
 
 const router = express.Router();
 
-router.use(cors({ origin: "*" }));
+router.use(cors());
 
 router.get("/", cors(), kindOfServices.getAllKindOfServices);
 // router.get("/:id", cors(), magController.getMag);

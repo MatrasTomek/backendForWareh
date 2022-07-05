@@ -4,7 +4,7 @@ const userController = require("../controllers/user.controller");
 
 const router = express.Router();
 
-router.use(cors({ origin: "*" }));
+router.use(cors());
 
 // router.get("/", eventsController.getEvents);
 router.get("/:login", cors(), userController.getUser);
