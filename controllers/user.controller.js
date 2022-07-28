@@ -2,12 +2,12 @@ const db = require("../database");
 const helpers = require("../helpers/handleErrors");
 const addError = require("../helpers/setDataError");
 const crypto = require("crypto");
+const mailer = require("../helpers/sendMail");
+const adminMailer = require("../helpers/adminMail");
 
 // ADD USER
 exports.postUser = (req, res, next) => {
 	const { login, password } = req.body;
-
-	console.log(req.body);
 
 	const secret = "";
 	const md5Hasher = crypto.createHmac("md5", secret);
@@ -17,7 +17,6 @@ exports.postUser = (req, res, next) => {
 
 	db.query(sqlDoubleUserMail, function (err, data) {
 		if (!err) {
-			console.log(data);
 			if (data.length && data[0].uzyt_email === `${login}`) {
 				res.json({
 					status: 404,
@@ -57,6 +56,24 @@ exports.postUser = (req, res, next) => {
 								status: 200,
 								message: `${login}`,
 							});
+							// HANDLE SEND EMAIL TO NEW USER
+							const props = {
+								title: "Witamy w gronie Klientów twojemagazyny.pl",
+								infoBeforeLink:
+									"Proces rejestracji został rozpoczęty. Aby kontynuować proces rejestracji proszę potwierdzić klikając w poniższy link: ",
+								link: `http://twojemagazyny.pl/#/activate`,
+								additionalInfo: "Pozdrawiamy, twojemagazyny.pl",
+								subject: "Potwierdzenie rejestracji konta",
+								mailTo: `${login}`,
+							};
+							mailer.mailSend(props);
+
+							//SEND MAIL To ADMIN
+							const adminData = {
+								mailFrom: `${login}`,
+								content: "dodał konto",
+							};
+							adminMailer.adminInfo(adminData);
 						} else {
 							const error = `errCode:${err.code}, errNo:${err.errno}, ${err.sql}`;
 							addError.dataSetError(error);
@@ -77,6 +94,24 @@ exports.postUser = (req, res, next) => {
 	});
 };
 
+// EDIT USER ACTIVE
+exports.postUserActive = (req, res, next) => {
+	const { login } = req.body;
+
+	const sqlSetActiv = `UPDATE Uzytkownik SET uzyt_aktywny = 1 WHERE uzyt_email = ${login}`;
+	db.query(sqlSetActiv, function (err, data, fields) {
+		if (!err) {
+			return;
+		} else {
+			const error = `errCode:${err.code}, errNo:${err.errno}, ${err.sql}`;
+			addError.dataSetError(error);
+			const errData = helpers.handleErrors();
+			res.json(errData);
+			return;
+		}
+	});
+};
+
 // LOGIN USER
 exports.loginUser = (req, res, next) => {
 	const { login, password } = req.body;
@@ -87,6 +122,7 @@ exports.loginUser = (req, res, next) => {
 
 	const promiseUserActive = new Promise((resolve, reject) => {
 		const sqlUserActive = `SELECT * FROM Uzytkownik`;
+
 		db.query(sqlUserActive, function (err, data) {
 			const searchedData = [];
 			if (!err) {
@@ -99,6 +135,7 @@ exports.loginUser = (req, res, next) => {
 					}
 				});
 			} else {
+				console.log("ERR");
 				const error = `errCode:${err.code}, errNo:${err.errno}, ${err.sql}`;
 				addError.dataSetError(error);
 				const errData = helpers.handleErrors();
@@ -120,7 +157,7 @@ exports.loginUser = (req, res, next) => {
 		} else if (searchedData[0].uzyt_haslo === hash.toString()) {
 			res.json({
 				status: 200,
-				data: searchedData,
+				data: searchedData[0],
 			});
 		}
 	});

@@ -1,6 +1,6 @@
-const db = require('../database');
-const helpers = require('../helpers/handleErrors');
-const addError = require('../helpers/setDataError');
+const db = require("../database");
+const helpers = require("../helpers/handleErrors");
+const addError = require("../helpers/setDataError");
 
 exports.getServiceByMieId = (req, res, next) => {
 	const { id } = req.params;
@@ -28,17 +28,16 @@ exports.postService = (req, res, next) => {
 	const { mie_id, services, uslugi_ilosc_palet, uslugi_wymiar } = req.body;
 
 	const promiseSetPrices = new Promise((resolve, reject) => {
-		const pricesData = [];
-		const sqlGetPrice = `SELECT * FROM CennikiDetails`;
+		const sqlGetPrice = `SELECT * FROM CennikiDetails WHERE cendet_RodzajeUslug_id=${services}`;
 		db.query(sqlGetPrice, function (err, data, fields) {
 			if (!err) {
-				const servicePrice = data.find((item) => item.cendet_id === services[0]);
-				pricesData.push(servicePrice);
+				// const servicePrice = data.find((item) => item.cendet_id === services);
+				// pricesData.push(servicePrice);
 
-				const handlingPrice = data.find((item) => item.cendet_id === services[1]);
-				pricesData.push(handlingPrice);
+				// const handlingPrice = data.find((item) => item.cendet_id === services[1]);
+				// pricesData.push(handlingPrice);
 
-				resolve(pricesData);
+				resolve(data);
 			} else {
 				const error = `errCode:${err.code}, errNo:${err.errno}, ${err.sql}`;
 				console.log(error);
@@ -52,7 +51,7 @@ exports.postService = (req, res, next) => {
 	promiseSetPrices.then((pricesData) => {
 		const errorsArr = [];
 
-		const servicePrice = (pricesData[0].cendet_CenaNetto * uslugi_wymiar[0] * uslugi_wymiar[1]) / 960000;
+		const servicePrice = (Number(pricesData[0].cendet_CenaNetto) * uslugi_wymiar[0] * uslugi_wymiar[1]) / 960000;
 
 		const sqlAddService = `INSERT INTO Uslugi (uslugi_RodzajeUslug_id, uslugi_pakowanie_id, uslugi_mie_id, uslugi_cennik_id, uslugi_wartosc, uslugi_ilosc_palet, uslugi_wymiar) VALUES (${pricesData[0].cendet_RodzajeUslug_id}, ${pricesData[0].cendet_pakowanie_id}, ${mie_id}, ${pricesData[0].cendet_id}, ${servicePrice}, ${uslugi_ilosc_palet}, POINT(${uslugi_wymiar[0]}, ${uslugi_wymiar[1]}))`;
 		db.query(sqlAddService, (err, data) => {
@@ -64,17 +63,17 @@ exports.postService = (req, res, next) => {
 			}
 		});
 
-		const handlingPrice = (pricesData[1].cendet_CenaNetto * uslugi_wymiar[0] * uslugi_wymiar[1]) / 960000;
+		// const handlingPrice = (pricesData[1].cendet_CenaNetto * uslugi_wymiar[0] * uslugi_wymiar[1]) / 960000;
 
-		const sqlAddHandling = `INSERT INTO Uslugi (uslugi_RodzajeUslug_id, uslugi_pakowanie_id, uslugi_mie_id, uslugi_cennik_id, uslugi_wartosc, uslugi_ilosc_palet, uslugi_wymiar) VALUES (${pricesData[1].cendet_RodzajeUslug_id}, ${pricesData[1].cendet_pakowanie_id}, ${mie_id}, ${pricesData[1].cendet_id}, ${handlingPrice}, ${uslugi_ilosc_palet}, POINT(${uslugi_wymiar[0]}, ${uslugi_wymiar[1]}))`;
-		db.query(sqlAddHandling, (err, data) => {
-			if (!err) {
-				return;
-			} else {
-				errorsArr.push(err);
-				return;
-			}
-		});
+		// const sqlAddHandling = `INSERT INTO Uslugi (uslugi_RodzajeUslug_id, uslugi_pakowanie_id, uslugi_mie_id, uslugi_cennik_id, uslugi_wartosc, uslugi_ilosc_palet, uslugi_wymiar) VALUES (${pricesData[1].cendet_RodzajeUslug_id}, ${pricesData[1].cendet_pakowanie_id}, ${mie_id}, ${pricesData[1].cendet_id}, ${handlingPrice}, ${uslugi_ilosc_palet}, POINT(${uslugi_wymiar[0]}, ${uslugi_wymiar[1]}))`;
+		// db.query(sqlAddHandling, (err, data) => {
+		// 	if (!err) {
+		// 		return;
+		// 	} else {
+		// 		errorsArr.push(err);
+		// 		return;
+		// 	}
+		// });
 
 		// pricesData.forEach((item) => {
 		//   const uslugi_wartosc =
