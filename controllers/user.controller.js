@@ -4,10 +4,11 @@ const addError = require("../helpers/setDataError");
 const crypto = require("crypto");
 const mailer = require("../helpers/sendMail");
 const adminMailer = require("../helpers/adminMail");
+const uuid = require("uuid");
 
 // ADD USER
 exports.postUser = (req, res, next) => {
-	const { login, password } = req.body;
+	const { login, password, kind } = req.body;
 
 	const secret = "";
 	const md5Hasher = crypto.createHmac("md5", secret);
@@ -20,7 +21,7 @@ exports.postUser = (req, res, next) => {
 			if (data.length && data[0].uzyt_email === `${login}`) {
 				res.json({
 					status: 404,
-					message: `Użytkownik: ${login}, istnieje w bazie danych.`,
+					message: `Użytkownik: ${login}, już istnieje!!!.`,
 				});
 			} else if (data.length && data[0].uzyt_aktywny === 1) {
 				res.json({
@@ -61,7 +62,11 @@ exports.postUser = (req, res, next) => {
 								title: "Witamy w gronie Klientów twojemagazyny.pl",
 								infoBeforeLink:
 									"Proces rejestracji został rozpoczęty. Aby kontynuować proces rejestracji proszę potwierdzić klikając w poniższy link: ",
-								link: `http://twojemagazyny.pl/#/activate`,
+								link: `${
+									kind === "wareh-finder"
+										? "http://twojemagazyny.pl/#/change-pass"
+										: "http://mag.twojemagazyny.pl/#/change-pass"
+								}`,
 								additionalInfo: "Pozdrawiamy, twojemagazyny.pl",
 								subject: "Potwierdzenie rejestracji konta",
 								mailTo: `${login}`,
@@ -71,7 +76,9 @@ exports.postUser = (req, res, next) => {
 							//SEND MAIL To ADMIN
 							const adminData = {
 								mailFrom: `${login}`,
-								content: "dodał konto",
+								content: `dodał konto jako ${
+									kind === "wareh-owner" ? "właściciel magazynu" : "szukający magazynu"
+								}`,
 							};
 							adminMailer.adminInfo(adminData);
 						} else {
@@ -96,12 +103,33 @@ exports.postUser = (req, res, next) => {
 
 // EDIT USER ACTIVE
 exports.postUserActive = (req, res, next) => {
-	const { login } = req.body;
+	const { userLogin } = req.body;
 
-	const sqlSetActiv = `UPDATE Uzytkownik SET uzyt_aktywny = 1 WHERE uzyt_email = ${login}`;
-	db.query(sqlSetActiv, function (err, data, fields) {
+	const sqlCheckIfUserExist = `SELECT * FROM Uzytkownik WHERE uzyt_email='${userLogin}'`;
+	db.query(sqlCheckIfUserExist, function (err, data, fields) {
 		if (!err) {
-			return;
+			if (!data.length) {
+				res.json({
+					status: 404,
+					message: `Użytkownik ${userLogin} nie istnieje.`,
+				});
+				return;
+			} else {
+				const sqlSetActiv = `UPDATE Uzytkownik SET uzyt_aktywny = 1 WHERE uzyt_email = "${userLogin}"`;
+				db.query(sqlSetActiv, function (err, data, fields) {
+					if (!err) {
+						res.json({
+							status: 200,
+						});
+					} else {
+						const error = `errCode:${err.code}, errNo:${err.errno}, ${err.sql}`;
+						addError.dataSetError(error);
+						const errData = helpers.handleErrors();
+						res.json(errData);
+						return;
+					}
+				});
+			}
 		} else {
 			const error = `errCode:${err.code}, errNo:${err.errno}, ${err.sql}`;
 			addError.dataSetError(error);
@@ -159,6 +187,60 @@ exports.loginUser = (req, res, next) => {
 				status: 200,
 				data: searchedData[0],
 			});
+
+			let uuidRandom = uuid.v4();
+			let tokenId = uuidRandom.slice(0, 7);
+
+			const sqlSetTokenId = `UPDATE Uzytkownik SET uzyt_token_id = '${tokenId}' WHERE uzyt_id = ${searchedData[0].uzyt_id}`;
+			db.query(sqlSetTokenId, function (err, data) {
+				if (!err) {
+					// HANDLE SEND EMAIL TO  USER
+					const props = {
+						title: "Kod autoryzacyjny",
+						infoBeforeLink: `${tokenId}`,
+						link: "",
+						additionalInfo: "Pozdrawiamy, twojemagazyny.pl",
+						subject: "Kod autoryzacyjny - twojemagazyny.pl",
+						mailTo: `${login}`,
+					};
+					mailer.mailSend(props);
+				} else {
+					console.log("ERR");
+					const error = `errCode:${err.code}, errNo:${err.errno}, ${err.sql}`;
+					addError.dataSetError(error);
+					const errData = helpers.handleErrors();
+					res.json(errData);
+					return;
+				}
+			});
+		}
+	});
+};
+
+// AUTH USER
+exports.authUser = (req, res, next) => {
+	const { uzyt_id, auth } = req.body;
+
+	const sqlAuthUser = `SELECT * FROM Uzytkownik WHERE uzyt_id="${uzyt_id}"`;
+
+	db.query(sqlAuthUser, function (err, data) {
+		if (!err) {
+			if (data[0].uzyt_token_id !== auth) {
+				res.json({ status: 404, message: "Autoryzacja nieudana! Błędny Kod!" });
+			} else {
+				const user = {
+					uzyt_id: data[0].uzyt_id,
+					uzyt_email: data[0].uzyt_email,
+					uzyt_aktywny: data[0].uzyt_aktywny,
+				};
+				res.json({ status: 200, data: user });
+			}
+		} else {
+			const error = `errCode:${err.code}, errNo:${err.errno}, ${err.sql}`;
+			addError.dataSetError(error);
+			const errData = helpers.handleErrors();
+			res.json(errData);
+			return;
 		}
 	});
 };
@@ -167,7 +249,7 @@ exports.loginUser = (req, res, next) => {
 exports.getUser = (req, res, next) => {
 	const { id } = req.params;
 
-	const sqlGetUserById = `SELECT * FROM Uzytkownik WHERE uzyt_id=${id}`;
+	const sqlGetUserById = `SELECT * FROM Uzytkownik WHERE uzyt_id="${id}"`;
 
 	db.query(sqlGetUserById, function (err, data) {
 		if (!err) {
@@ -187,8 +269,8 @@ exports.getUser = (req, res, next) => {
 	});
 };
 
-// EDIT USER
-exports.putUser = (req, res, next) => {
+// EDIT USER CHANGE PASS BY ID
+exports.userChangePassById = (req, res, next) => {
 	const { id, login, newPassword } = req.body;
 
 	const secret = "";
@@ -212,9 +294,46 @@ exports.putUser = (req, res, next) => {
 	});
 };
 
+// EDIT USER CHANGE PASS BY EMAIL
+exports.userChangePassByEmail = (req, res, next) => {
+	const { login, password } = req.body;
+
+	const secret = "";
+	const md5Hasher = crypto.createHmac("md5", secret);
+	const hash = md5Hasher.update(password).digest("hex");
+
+	const sqlChangePass = `UPDATE Uzytkownik SET uzyt_haslo = '${hash}' WHERE uzyt_email ="${login}"`;
+	db.query(sqlChangePass, function (err, data, fields) {
+		if (!err) {
+			if (data.affectedRows === 0) {
+				res.json({
+					status: 404,
+					message: `Użytkownik ${login} nie istnieje`,
+				});
+			} else if (data.affectedRows === 1)
+				res.json({
+					status: 200,
+					message: `Hasło zostało zmienione`,
+				});
+			//SEND MAIL To ADMIN
+			const adminData = {
+				mailFrom: `${login}`,
+				content: "zmienił hasło",
+			};
+			adminMailer.adminInfo(adminData);
+		} else {
+			const error = `errCode:${err.code}, errNo:${err.errno}, ${err.sql}`;
+			addError.dataSetError(error);
+			const errData = helpers.handleErrors();
+			res.json(errData);
+			return;
+		}
+	});
+};
+
 // LOST PASS
 exports.userLostPassword = (req, res) => {
-	const { login } = req.body;
+	const { login, kind } = req.body;
 
 	const sqlFindUserByEmail = `SELECT * FROM Uzytkownik WHERE uzyt_email='${login}'`;
 	db.query(sqlFindUserByEmail, function (err, data) {
@@ -228,6 +347,20 @@ exports.userLostPassword = (req, res) => {
 			} else {
 				data = { status: 200, message: true };
 				res.json(data);
+				// HANDLE SEND EMAIL TO NEW USER
+				const props = {
+					title: `Zmiana hasła do konta ${login}`,
+					infoBeforeLink: "Aby zmienić hasło kliknij w poniższy link ",
+					link: `${
+						kind === "wareh-finder"
+							? "http://twojemagazyny.pl/#/activate"
+							: "http://mag.twojemagazyny.pl/#/activate"
+					}`,
+					additionalInfo: "Pozdrawiamy, twojemagazyny.pl",
+					subject: "Zmiana hasła",
+					mailTo: `${login}`,
+				};
+				mailer.mailSend(props);
 			}
 		} else {
 			const error = `errCode:${err.code}, errNo:${err.errno}, ${err.sql}`;
