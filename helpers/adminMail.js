@@ -24,7 +24,7 @@ exports.adminInfo = (adminData) => {
 
 	transport
 		.sendMail({
-			to: "jacek@itjk.pl",
+			to: "rejestracja@twojemagazyny.pl",
 			from: "automat@twojemagazyny.pl",
 			subject: `Użytkownik ${content}`,
 			html: `<p>Użytkownik: ${mailFrom} - ${content} </p>`,
