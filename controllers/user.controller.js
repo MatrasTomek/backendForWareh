@@ -284,6 +284,22 @@ exports.userChangePassById = (req, res, next) => {
 				status: 200,
 				message: "Hasło zostało zmienione",
 			});
+			// HANDLE SEND EMAIL TO  USER
+			const props = {
+				title: "Zmiana hasła",
+				infoBeforeLink: `Potwierdzamy zmianę hasła z poziomu zalogowanego użytkownika`,
+				link: "",
+				additionalInfo: "Pozdrawiamy, twojemagazyny.pl",
+				subject: "Zmiana hasła",
+				mailTo: `${login}`,
+			};
+			mailer.mailSend(props);
+			//SEND MAIL To ADMIN
+			const adminData = {
+				mailFrom: `${login}`,
+				content: "zmienił hasło z poziomu zalogowanego użytkownika",
+			};
+			adminMailer.adminInfo(adminData);
 		} else {
 			const error = `errCode:${err.code}, errNo:${err.errno}, ${err.sql}`;
 			addError.dataSetError(error);
@@ -315,10 +331,20 @@ exports.userChangePassByEmail = (req, res, next) => {
 					status: 200,
 					message: `Hasło zostało zmienione`,
 				});
+			// HANDLE SEND EMAIL TO  USER
+			const props = {
+				title: "Zmiana utraconego hasła",
+				infoBeforeLink: `Potwierdzamy zmianę utraconego hasła.`,
+				link: "",
+				additionalInfo: "Pozdrawiamy, twojemagazyny.pl",
+				subject: "Zmiana utraconego hasła",
+				mailTo: `${login}`,
+			};
+			mailer.mailSend(props);
 			//SEND MAIL To ADMIN
 			const adminData = {
 				mailFrom: `${login}`,
-				content: "zmienił hasło",
+				content: "zmienił hasło z pozoimu utraconego hasła.",
 			};
 			adminMailer.adminInfo(adminData);
 		} else {
@@ -353,8 +379,8 @@ exports.userLostPassword = (req, res) => {
 					infoBeforeLink: "Aby zmienić hasło kliknij w poniższy link ",
 					link: `${
 						kind === "wareh-finder"
-							? "http://twojemagazyny.pl/#/activate"
-							: "http://mag.twojemagazyny.pl/#/activate"
+							? "http://twojemagazyny.pl/#/change-pass"
+							: "http://mag.twojemagazyny.pl/#/change-pass"
 					}`,
 					additionalInfo: "Pozdrawiamy, twojemagazyny.pl",
 					subject: "Zmiana hasła",
