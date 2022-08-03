@@ -64,8 +64,8 @@ exports.postUser = (req, res, next) => {
 									"Proces rejestracji został rozpoczęty. Aby kontynuować proces rejestracji proszę potwierdzić klikając w poniższy link: ",
 								link: `${
 									kind === "wareh-finder"
-										? "http://twojemagazyny.pl/#/change-pass"
-										: "http://mag.twojemagazyny.pl/#/change-pass"
+										? "http://twojemagazyny.pl/#/activate"
+										: "http://mag.twojemagazyny.pl/#/activate"
 								}`,
 								additionalInfo: "Pozdrawiamy, twojemagazyny.pl",
 								subject: "Potwierdzenie rejestracji konta",
@@ -371,17 +371,22 @@ exports.userLostPassword = (req, res) => {
 				dataErr = { status: 404, message: `użytkownik ${login} nie aktywny lub zablokowany` };
 				res.json(dataErr);
 			} else {
-				data = { status: 200, message: true };
+				let uuidRandom = uuid.v4();
+				data = { status: 200, message: true, data: uuidRandom };
 				res.json(data);
 				// HANDLE SEND EMAIL TO NEW USER
 				const props = {
 					title: `Zmiana hasła do konta ${login}`,
 					infoBeforeLink: "Aby zmienić hasło kliknij w poniższy link ",
+
 					link: `${
 						kind === "wareh-finder"
-							? "http://twojemagazyny.pl/#/change-pass"
-							: "http://mag.twojemagazyny.pl/#/change-pass"
+							? `http://mag.twojemagazyny.pl/#/${uuidRandom}`
+							: `http://twojemagazyny.pl/#/${uuidRandom}`
 					}`,
+
+					// link: `http://localhost:3000/#/${uuidRandom}`,
+
 					additionalInfo: "Pozdrawiamy, twojemagazyny.pl",
 					subject: "Zmiana hasła",
 					mailTo: `${login}`,
