@@ -426,7 +426,7 @@ exports.userLostPassword = (req, res) => {
 							: `http://twojemagazyny.pl/#/change-pass`
 					}`,
 
-					link: "http://localhost:3000/#/change-pass",
+					// link: "http://localhost:3000/#/change-pass",
 
 					additionalInfo: "Pozdrawiamy, twojemagazyny.pl",
 					subject: "Zmiana hasła",
