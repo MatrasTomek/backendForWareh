@@ -322,7 +322,12 @@ exports.userChangePassByEmail = (req, res, next) => {
 		const sqlAuthUser = `SELECT * FROM Uzytkownik WHERE uzyt_email="${login}"`;
 		db.query(sqlAuthUser, function (err, data) {
 			if (!err) {
-				if (data[0].uzyt_token_id !== tokenId) {
+				if (!data.length) {
+					res.json({
+						status: 404,
+						message: `Użytkownik ${login} nie istnieje`,
+					});
+				} else if (data[0].uzyt_token_id !== tokenId) {
 					res.json({ status: 404, message: "Autoryzacja nieudana! Błędny Kod!" });
 					return;
 				} else {
@@ -342,16 +347,11 @@ exports.userChangePassByEmail = (req, res, next) => {
 		const sqlChangePass = `UPDATE Uzytkownik SET uzyt_haslo = '${hash}' WHERE uzyt_email ="${login}"`;
 		db.query(sqlChangePass, function (err, data, fields) {
 			if (!err) {
-				if (data.affectedRows === 0) {
-					res.json({
-						status: 404,
-						message: `Użytkownik ${login} nie istnieje`,
-					});
-				} else if (data.affectedRows === 1)
-					res.json({
-						status: 200,
-						message: `Hasło zostało zmienione`,
-					});
+				res.json({
+					status: 200,
+					message: `Hasło zostało zmienione`,
+					data: [],
+				});
 				// HANDLE SEND EMAIL TO  USER
 				const props = {
 					title: "Zmiana utraconego hasła",

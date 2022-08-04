@@ -116,7 +116,7 @@ exports.postService = (req, res, next) => {
 exports.getAllJoinedInfoTransakcjeId = (req, res, next) => {
 	const { id } = req.params;
 
-	const sqlGetAllJoinedInfo = `SELECT mie_id, mie_rez_od, mie_rez_do, mie_ilosc, uslugi_RodzajeUslug_id, uslugi_ilosc_palet, uslugi_wymiar, RodzajeUslug_opis, mag_nazwa, mag_kodpocztowy, mag_adres, mag_miejscowosc, mie_mag_id FROM Miejsca, Uslugi, RodzajeUslug, Mag WHERE mie_tran_id=${id} and uslugi_mie_id=mie_id and RodzajeUslug_id=uslugi_RodzajeUslug_id and mag_id=mie_mag_id `;
+	const sqlGetAllJoinedInfo = `SELECT mie_id, mie_rez_od, mie_rez_do, mie_ilosc, mie_wyszlo, uslugi_RodzajeUslug_id, uslugi_ilosc_palet, uslugi_wymiar, RodzajeUslug_opis, mag_nazwa, mag_kodpocztowy, mag_adres, mag_miejscowosc, mag_kontakt_email, mie_mag_id FROM Miejsca, Uslugi, RodzajeUslug, Mag WHERE mie_tran_id=${id} and uslugi_mie_id=mie_id and RodzajeUslug_id=uslugi_RodzajeUslug_id and mag_id=mie_mag_id `;
 	db.query(sqlGetAllJoinedInfo, function (err, data, fields) {
 		if (!err) {
 			data[0].tran_id = Number(id);
