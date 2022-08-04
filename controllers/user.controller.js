@@ -420,11 +420,11 @@ exports.userLostPassword = (req, res) => {
 					title: `Zmiana hasła do konta ${login}`,
 					infoBeforeLink: `Aby zmienić hasło kliknij w poniższy link, wpisz wymagane dane i token: ${tokenId}`,
 
-					// link: `${
-					// 	kind === "wareh-finder"
-					// 		? `http://mag.twojemagazyny.pl/#/change-pass`
-					// 		: `http://twojemagazyny.pl/#/change-pass`
-					// }`,
+					link: `${
+						kind === "wareh-finder"
+							? `http://mag.twojemagazyny.pl/#/change-pass`
+							: `http://twojemagazyny.pl/#/change-pass`
+					}`,
 
 					link: "http://localhost:3000/#/change-pass",
 
