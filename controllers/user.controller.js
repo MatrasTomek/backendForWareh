@@ -312,48 +312,70 @@ exports.userChangePassById = (req, res, next) => {
 
 // EDIT USER CHANGE PASS BY EMAIL
 exports.userChangePassByEmail = (req, res, next) => {
-	const { login, password } = req.body;
+	const { login, password, tokenId } = req.body;
 
 	const secret = "";
 	const md5Hasher = crypto.createHmac("md5", secret);
 	const hash = md5Hasher.update(password).digest("hex");
 
-	const sqlChangePass = `UPDATE Uzytkownik SET uzyt_haslo = '${hash}' WHERE uzyt_email ="${login}"`;
-	db.query(sqlChangePass, function (err, data, fields) {
-		if (!err) {
-			if (data.affectedRows === 0) {
-				res.json({
-					status: 404,
-					message: `Użytkownik ${login} nie istnieje`,
-				});
-			} else if (data.affectedRows === 1)
-				res.json({
-					status: 200,
-					message: `Hasło zostało zmienione`,
-				});
-			// HANDLE SEND EMAIL TO  USER
-			const props = {
-				title: "Zmiana utraconego hasła",
-				infoBeforeLink: `Potwierdzamy zmianę utraconego hasła.`,
-				link: "",
-				additionalInfo: "Pozdrawiamy, twojemagazyny.pl",
-				subject: "Zmiana utraconego hasła",
-				mailTo: `${login}`,
-			};
-			mailer.mailSend(props);
-			//SEND MAIL To ADMIN
-			const adminData = {
-				mailFrom: `${login}`,
-				content: "zmienił hasło z pozoimu utraconego hasła.",
-			};
-			adminMailer.adminInfo(adminData);
-		} else {
-			const error = `errCode:${err.code}, errNo:${err.errno}, ${err.sql}`;
-			addError.dataSetError(error);
-			const errData = helpers.handleErrors();
-			res.json(errData);
-			return;
-		}
+	const promiseIsTokenIdCorrect = new Promise((resolve, reject) => {
+		const sqlAuthUser = `SELECT * FROM Uzytkownik WHERE uzyt_email="${login}"`;
+		db.query(sqlAuthUser, function (err, data) {
+			if (!err) {
+				if (data[0].uzyt_token_id !== tokenId) {
+					res.json({ status: 404, message: "Autoryzacja nieudana! Błędny Kod!" });
+					return;
+				} else {
+					resolve();
+				}
+			} else {
+				const error = `errCode:${err.code}, errNo:${err.errno}, ${err.sql}`;
+				addError.dataSetError(error);
+				const errData = helpers.handleErrors();
+				res.json(errData);
+				return;
+			}
+		});
+	});
+
+	promiseIsTokenIdCorrect.then(() => {
+		const sqlChangePass = `UPDATE Uzytkownik SET uzyt_haslo = '${hash}' WHERE uzyt_email ="${login}"`;
+		db.query(sqlChangePass, function (err, data, fields) {
+			if (!err) {
+				if (data.affectedRows === 0) {
+					res.json({
+						status: 404,
+						message: `Użytkownik ${login} nie istnieje`,
+					});
+				} else if (data.affectedRows === 1)
+					res.json({
+						status: 200,
+						message: `Hasło zostało zmienione`,
+					});
+				// HANDLE SEND EMAIL TO  USER
+				const props = {
+					title: "Zmiana utraconego hasła",
+					infoBeforeLink: `Potwierdzamy zmianę utraconego hasła.`,
+					link: "",
+					additionalInfo: "Pozdrawiamy, twojemagazyny.pl",
+					subject: "Zmiana utraconego hasła",
+					mailTo: `${login}`,
+				};
+				mailer.mailSend(props);
+				//SEND MAIL To ADMIN
+				const adminData = {
+					mailFrom: `${login}`,
+					content: "zmienił hasło z pozoimu utraconego hasła.",
+				};
+				adminMailer.adminInfo(adminData);
+			} else {
+				const error = `errCode:${err.code}, errNo:${err.errno}, ${err.sql}`;
+				addError.dataSetError(error);
+				const errData = helpers.handleErrors();
+				res.json(errData);
+				return;
+			}
+		});
 	});
 };
 
@@ -361,45 +383,66 @@ exports.userChangePassByEmail = (req, res, next) => {
 exports.userLostPassword = (req, res) => {
 	const { login, kind } = req.body;
 
-	const sqlFindUserByEmail = `SELECT * FROM Uzytkownik WHERE uzyt_email='${login}'`;
-	db.query(sqlFindUserByEmail, function (err, data) {
-		if (!err) {
-			if (!data.length) {
-				dataErr = { status: 404, message: `użytkownik ${login} nie istnieje` };
-				res.json(dataErr);
-			} else if (data[0].uzyt_aktywny === 0 || data[0].uzyt_zablokow === 1) {
-				dataErr = { status: 404, message: `użytkownik ${login} nie aktywny lub zablokowany` };
-				res.json(dataErr);
+	const promiseUserActive = new Promise((resolve, reject) => {
+		const sqlFindUserByEmail = `SELECT * FROM Uzytkownik WHERE uzyt_email='${login}'`;
+		db.query(sqlFindUserByEmail, function (err, data) {
+			if (!err) {
+				if (!data.length) {
+					dataErr = { status: 404, message: `użytkownik ${login} nie istnieje` };
+					res.json(dataErr);
+					return;
+				} else if (data[0].uzyt_aktywny === 0 || data[0].uzyt_zablokow === 1) {
+					dataErr = { status: 404, message: `użytkownik ${login} nie aktywny lub zablokowany` };
+					res.json(dataErr);
+					return;
+				} else {
+					resolve();
+				}
 			} else {
-				let uuidRandom = uuid.v4();
-				data = { status: 200, message: true, data: uuidRandom };
-				res.json(data);
-				// HANDLE SEND EMAIL TO NEW USER
+				const error = `errCode:${err.code}, errNo:${err.errno}, ${err.sql}`;
+				addError.dataSetError(error);
+				const errData = helpers.handleErrors();
+				res.json(errData);
+				return;
+			}
+		});
+	});
+
+	promiseUserActive.then(() => {
+		let uuidRandom = uuid.v4();
+		let tokenId = uuidRandom.slice(0, 7);
+
+		const sqlSetTokenId = `UPDATE Uzytkownik SET uzyt_token_id = '${tokenId}' WHERE uzyt_email = '${login}'`;
+		db.query(sqlSetTokenId, function (err, data) {
+			if (!err) {
+				// HANDLE SEND EMAIL TO USER
 				const props = {
 					title: `Zmiana hasła do konta ${login}`,
-					infoBeforeLink: "Aby zmienić hasło kliknij w poniższy link ",
+					infoBeforeLink: `Aby zmienić hasło kliknij w poniższy link, wpisz wymagane dane i token: ${tokenId}`,
 
-					link: `${
-						kind === "wareh-finder"
-							? `http://mag.twojemagazyny.pl/#/${uuidRandom}`
-							: `http://twojemagazyny.pl/#/${uuidRandom}`
-					}`,
+					// link: `${
+					// 	kind === "wareh-finder"
+					// 		? `http://mag.twojemagazyny.pl/#/change-pass`
+					// 		: `http://twojemagazyny.pl/#/change-pass`
+					// }`,
 
-					// link: `http://localhost:3000/#/${uuidRandom}`,
+					link: "http://localhost:3000/#/change-pass",
 
 					additionalInfo: "Pozdrawiamy, twojemagazyny.pl",
 					subject: "Zmiana hasła",
 					mailTo: `${login}`,
 				};
 				mailer.mailSend(props);
+				data = { status: 200, message: true, data: [] };
+				res.json(data);
+			} else {
+				const error = `errCode:${err.code}, errNo:${err.errno}, ${err.sql}`;
+				addError.dataSetError(error);
+				const errData = helpers.handleErrors();
+				res.json(errData);
+				return;
 			}
-		} else {
-			const error = `errCode:${err.code}, errNo:${err.errno}, ${err.sql}`;
-			addError.dataSetError(error);
-			const errData = helpers.handleErrors();
-			res.json(errData);
-			return;
-		}
+		});
 	});
 };
 
