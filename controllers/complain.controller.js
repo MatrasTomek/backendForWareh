@@ -3,6 +3,7 @@ const helpers = require("../helpers/handleErrors");
 const addError = require("../helpers/setDataError");
 const mailer = require("../helpers/sendMail");
 const adminMailer = require("../helpers/adminMail");
+const warehMailer = require("../helpers/warehMail");
 
 exports.getComplainByMieId = (req, res, next) => {
 	const { mie_id } = req.params;
@@ -19,7 +20,19 @@ exports.getComplainByMieId = (req, res, next) => {
 };
 
 exports.postComplainByUser = (req, res, next) => {
-	const { mie_id, Mie_ReklamacjaStatus, Mie_ReklamacjaData, Mie_ReklamacjaTresc } = req.body;
+	const {
+		mie_id,
+		tran_id,
+		mag_nazwa,
+		mag_miejscowosc,
+		mag_kodpocztowy,
+		mag_adres,
+		mag_kontakt_email,
+		Mie_ReklamacjaStatus,
+		Mie_ReklamacjaData,
+		Mie_ReklamacjaTresc,
+		userMail,
+	} = req.body;
 
 	const sqlSetCopmplainByUser = `UPDATE Miejsca SET Mie_ReklamacjaStatus=1, Mie_ReklamacjaData ='${Mie_ReklamacjaData}', Mie_ReklamacjaTresc ='${Mie_ReklamacjaTresc}' WHERE mie_id="${mie_id}"`;
 
@@ -29,6 +42,39 @@ exports.postComplainByUser = (req, res, next) => {
 				status: 200,
 				message: "Reklamacja złożona, instrukcja wysłana ma Twojego maila.",
 			});
+			// HANDLE SEND EMAIL TO USER
+			const props = {
+				title: `Reklamacja usługi ${mie_id}`,
+				infoBeforeLink: `Złożyłeś reklamację usługi:${mie_id} do transakcji:${tran_id}, do magazynu: ${mag_nazwa}, ${mag_adres}, ${mag_kodpocztowy}, ${mag_miejscowosc}. Data reklamacji: ${Mie_ReklamacjaData}. Treść reklamacji: ${Mie_ReklamacjaTresc}. Magazyn skontaktuje się z Tobą w ciągu 24h`,
+				link: "",
+				additionalInfo: "Pozdrawiamy, twojemagazyny.pl",
+				subject: `Reklamacja usługi ${mie_id}`,
+				mailTo: `${userMail}`,
+			};
+			mailer.mailSend(props);
+
+			//SEND MAIL TO ADMIN
+			const adminData = {
+				mailFrom: `${userMail}`,
+				content: `Zgłosił reklamację usługi:${mie_id} do transakcji:${tran_id}, do magazynu: ${mag_nazwa}, ${mag_adres}, ${mag_kodpocztowy}, ${mag_miejscowosc}. Data reklamacji: ${Mie_ReklamacjaData}. Treść reklamacji: ${Mie_ReklamacjaTresc}.`,
+			};
+			adminMailer.adminInfo(adminData);
+
+			//SEND MAIL TO WAREH
+			let warehMail = mag_kontakt_email;
+
+			if (!warehMail || warehMail === null) {
+				warehMail = "tomasz.matras@gmail.com";
+				const propsWareh = {
+					title: `Reklamacja usługi ${mie_id}`,
+					infoBeforeLink: `Klient: ${userMail} zgłosił reklamację usługi:${mie_id} do transakcji:${tran_id}, do magazynu: ${mag_nazwa}, ${mag_adres}, ${mag_kodpocztowy}, ${mag_miejscowosc}. Data reklamacji: ${Mie_ReklamacjaData}. Treść reklamacji: ${Mie_ReklamacjaTresc}.`,
+					link: "",
+					additionalInfo: "Pozdrawiamy, twojemagazyny.pl",
+					subject: `Reklamacja usługi ${mie_id}`,
+					mailTo: `${warehMail}`,
+				};
+				warehMailer.warehInfo(propsWareh);
+			}
 		} else {
 			const error = `errCode:${err.code}, errNo:${err.errno}, ${err.sql}`;
 			addError.dataSetError(error);
