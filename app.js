@@ -14,6 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const criteriaRoutes = require("./routes/zone.routes");
 const companyRoutes = require("./routes/company.routes");
+const complainRoutes = require("./routes//complain.routes");
 const detailsRoutes = require("./routes/details.routes");
 const historyRoutes = require("./routes/history.routes");
 const kindOfServicesRoutes = require("./routes/kindOfServices.routes");
@@ -26,6 +27,7 @@ const transactionRoutes = require("./routes/transaction.routes");
 const usersRoutes = require("./routes/users.routes");
 
 app.use("/company", companyRoutes);
+app.use("/complain", complainRoutes);
 app.use("/details", detailsRoutes);
 app.use("/history", historyRoutes);
 app.use("/kindof", kindOfServicesRoutes);
