@@ -159,7 +159,7 @@ exports.getAllJoinedInfoByWarehId = (req, res, next) => {
 exports.getAllJoinedInfoByCompanyId = (req, res, next) => {
 	const { id } = req.params;
 
-	const sqlGetAllJoinedInfoWareh = `SELECT tran_id, tran_nazwa, mie_id, mie_mag_id, mie_rez_od, mie_rez_do, mie_ilosc, mie_wyszlo, mag_miejscowosc, mag_adres FROM Transakcje, Miejsca, Mag WHERE tran_id_podmiot=${id} and mie_tran_id=tran_id and mag_id=mie_mag_id`;
+	const sqlGetAllJoinedInfoWareh = `SELECT tran_id, tran_nazwa, mie_id, mie_mag_id, mie_rez_od, mie_rez_do, mie_ilosc, mie_wyszlo, mie_ReklamacjaStatus, mie_ReklamacjaData, mie_ReklamacjaTresc, mag_miejscowosc, mag_adres FROM Transakcje, Miejsca, Mag WHERE tran_id_podmiot=${id} and mie_tran_id=tran_id and mag_id=mie_mag_id`;
 	db.query(sqlGetAllJoinedInfoWareh, function (err, data, fields) {
 		if (!err) {
 			res.json({
