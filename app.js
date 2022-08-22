@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const scheduledFunctions = require("./helpers/cronSchedule");
 
 const app = express();
 
@@ -39,6 +40,8 @@ app.use("/subscribe", subscriptionRoutes);
 app.use("/transactions", transactionRoutes);
 app.use("/user", usersRoutes);
 app.use("/zones", criteriaRoutes);
+
+scheduledFunctions.initScheduledJobs();
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
