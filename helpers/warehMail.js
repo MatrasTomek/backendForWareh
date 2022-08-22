@@ -5,7 +5,7 @@ const MAIL_PASS = process.env.MAIL_PASS;
 const MAIL_HOST = process.env.MAIL_HOST;
 
 exports.warehInfo = (propsWareh) => {
-	const { title, link, infoBeforeLink, additionalInfo, subject, mailTo } = propsWareh;
+	const { title, info1, info2, info3, info4, subject, mailTo } = propsWareh;
 
 	const mailFrom = "automat@twojemagazyny.pl";
 
@@ -29,7 +29,7 @@ exports.warehInfo = (propsWareh) => {
 			to: `${mailTo}`,
 			from: `${mailFrom}`,
 			subject: `${subject}`,
-			html: `<html>\n  <head><h2>${title}</h2>\n</head>\n  <body>\n    <p>${infoBeforeLink}  <br/>\n </p>\n <a href="${link}">${link}</a>\n <p>${additionalInfo}</p>\n</body>\n</html>`,
+			html: `<html>\n  <head><h3>${title}</h3>\n</head>\n  <body>\n    <p>${info1}  <br/>\n </p>\n <p>${info2}  <br/>\n </p>\n<p>${info3}  <br/>\n </p>\n<p>${info4}  <br/>\n </p>\n <h4>Pozdrawiamy, twojemagazyny.pl  <br/>\n </h4>\n</body>\n</html>`,
 		})
 		.then((data) => {
 			return data;

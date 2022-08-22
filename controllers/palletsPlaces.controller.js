@@ -146,13 +146,15 @@ exports.putGoodsWasTaken = (req, res, next) => {
 
 			//SEND MAIL TO WAREH
 			const propsWareh = {
-				title: "Potwierdzenie odbioru towaru przez Klienta",
-				infoBeforeLink: `Klient: ${userMail} właśnie potwierdził odbiór ${uslugi_ilosc_palet} palet, z magazynu: ${mag_nazwa}, ${mag_adres}, ${mag_kodpocztowy}, ${mag_miejscowosc}`,
-				link: "",
-				additionalInfo: "Pozdrawiamy, twojemagazyny.pl",
-				subject: "Potwierdzenie odbioru towaru Klienta",
 				mailTo: `${userMail}`,
+				subject: `Potwierdzenie odbioru towaru`,
+				title: `Potwierdzenie odbioru towaru od Klienta: ${userMail}`,
+				info1: `Klient: ${userMail} właśnie potwierdził odbiór ${uslugi_ilosc_palet} palet`,
+				info2: `Dane Magazynu odbioru: ${mag_nazwa}, ${mag_adres}, ${mag_kodpocztowy}, ${mag_miejscowosc}`,
+				info3: "",
+				info4: "",
 			};
+
 			warehMailer.warehInfo(propsWareh);
 		} else {
 			const error = `errCode:${err.code}, errNo:${err.errno}, ${err.sql}`;

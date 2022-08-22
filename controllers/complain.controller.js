@@ -23,6 +23,8 @@ exports.postComplainByUser = (req, res, next) => {
 	const {
 		mie_id,
 		tran_id,
+		tran_data,
+		tran_nazwa,
 		mag_nazwa,
 		mag_miejscowosc,
 		mag_kodpocztowy,
@@ -66,12 +68,13 @@ exports.postComplainByUser = (req, res, next) => {
 			if (!warehMail || warehMail === null) {
 				warehMail = "tomasz.matras@gmail.com";
 				const propsWareh = {
-					title: `Reklamacja usługi ${mie_id}`,
-					infoBeforeLink: `Klient: ${userMail} zgłosił reklamację usługi:${mie_id} do transakcji:${tran_id}, do magazynu: ${mag_nazwa}, ${mag_adres}, ${mag_kodpocztowy}, ${mag_miejscowosc}. Data reklamacji: ${Mie_ReklamacjaData}. Treść reklamacji: ${Mie_ReklamacjaTresc}.`,
-					link: "",
-					additionalInfo: "Pozdrawiamy, twojemagazyny.pl",
-					subject: `Reklamacja usługi ${mie_id}`,
 					mailTo: `${warehMail}`,
+					subject: `Reklamacja usługi ${mie_id}`,
+					title: `Klient: ${userMail} zgłosił reklamację usługi:${mie_id}`,
+					info1: `Dane Transakcji: ${tran_nazwa} z dnia: ${tran_data} `,
+					info2: `Dane Magazynu: ${mag_nazwa}, ${mag_kodpocztowy}, ${mag_miejscowosc}, ${mag_adres} `,
+					info3: `Reklamacja z dnia: ${Mie_ReklamacjaData}`,
+					info4: `Treść reklamacji: ${Mie_ReklamacjaTresc}`,
 				};
 				warehMailer.warehInfo(propsWareh);
 			}
